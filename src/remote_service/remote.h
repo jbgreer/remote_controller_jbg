@@ -10,6 +10,11 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-int ble_init(void);
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/gatt.h>
+#include <zephyr/bluetooth/hci.h>
+#include <zephyr/bluetooth/uuid.h>
+
+int bt_init(void);
 
 #endif  /* __REMOTE_H_ */

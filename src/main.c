@@ -68,7 +68,7 @@ void main(void)
 
 	int ret = 0;
 
-	ret = ble_init();
+	ret = bt_init();
 	if (!ret) {
 
 		ret = configure_dk_buttons_leds();
