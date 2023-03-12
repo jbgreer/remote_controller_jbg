@@ -9,6 +9,8 @@
 
 #include <dk_buttons_and_leds.h>
 
+#include "remote.h"
+
 #define LOG_MODULE_NAME			app
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
