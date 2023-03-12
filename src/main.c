@@ -37,7 +37,7 @@ void button_handler(uint32_t button_state, uint32_t has_changed) {
 			default:
 				break;
 		}
-		LOG_INF("button pressed >%d", button_pressed);
+		LOG_INF("button pressed>%d<", button_pressed);
 	}
 }
 
@@ -47,13 +47,13 @@ static int configure_dk_buttons_leds(void) {
 
 	ret = dk_leds_init();
 	if (ret) {
-		LOG_ERR("dk_leds_init failure: ret>%d<", ret);
+		LOG_ERR("dk_leds_init: ret>%d<", ret);
 		return ret;
 	}
 
 	ret = dk_buttons_init(button_handler);
 	if (ret) {
-		LOG_ERR("dk_buttons_init failure: ret>%d<", ret);
+		LOG_ERR("dk_buttons_init: ret>%d<", ret);
 		return ret;
 	}
 
@@ -63,17 +63,22 @@ static int configure_dk_buttons_leds(void) {
 
 void main(void)
 {
-	LOG_INF("Hello World! %s\n", CONFIG_BOARD);
+	LOG_INF("Startup:>%s<", CONFIG_BOARD);
 	int blink = 0;
 
-	int ret = configure_dk_buttons_leds();
+	int ret = 0;
+
+	ret = ble_init();
 	if (!ret) {
 
-		for (;;) {
-			dk_set_led(RUN_STATUS_LED, (blink++)%2);
-			k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
-		}
-	} else {
-		LOG_ERR("TERMINATING");
+		ret = configure_dk_buttons_leds();
+		if (!ret) {
+
+			for (;;) {
+				dk_set_led(RUN_STATUS_LED, (blink++)%2);
+				k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+			}
+		} 
 	}
+	LOG_ERR("TERMINATING");
 }
