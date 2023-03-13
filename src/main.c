@@ -24,11 +24,18 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 /* forward declarations for callback array */
 void on_connected(struct bt_conn *conn, uint8_t err);
 void on_disconnected(struct bt_conn *conn, uint8_t err);
+void on_notify_changed(enum bt_button_notifications_enabled status);
+void on_data_received(struct bt_conn *conn, const uint8_t *const data, uint16_t len);
 
 /* for bluetooth callbacks on connect, disconnect events */
 struct bt_conn_cb bluetooth_callbacks = {
 	.connected 	= on_connected,
 	.disconnected 	= on_disconnected,
+};
+
+struct bt_remote_service_cb remote_callbacks = {
+	.notify_changed = on_notify_changed,
+	.data_received = on_data_received,
 };
 
 /* current bluetooth connection, if any */
@@ -65,6 +72,25 @@ void on_disconnected(struct bt_conn *conn, uint8_t err) {
 	}
 }
 
+void on_notify_changed(enum bt_button_notifications_enabled status)
+{
+    if (status == BT_BUTTON_NOTIFICATIONS_ENABLED) {
+        LOG_INF("on_notify_changed: Notifications enabled");
+    } else {
+        LOG_INF("on_notify_changed: Notifications disabled");
+    }
+}
+
+void on_data_received(struct bt_conn *conn, const uint8_t *const data, uint16_t len)
+{
+    uint8_t temp_str[len+1];
+    memcpy(temp_str, data, len);
+    temp_str[len] = 0x00;
+
+    LOG_INF("on_data_received: Received data on conn %p. Len: %d", (void *)conn, len);
+    LOG_INF("Data: %s", temp_str);
+}
+
 /* 
  * button_handler for when buttons are pressed
  */
@@ -87,8 +113,12 @@ void button_handler(uint32_t button_state, uint32_t has_changed) {
 			default:
 				break;
 		}
-		LOG_INF("button pressed>%d<", button_pressed);
+		LOG_INF("button_handler: button pressed>%d<", button_pressed);
 		set_button_value(button_pressed);
+		int ret = send_button_notification(current_conn, button_pressed);
+		if (ret) {
+			LOG_ERR("button_handler: no notification >%d<", ret);
+		}
 	}
 }
 
@@ -124,8 +154,10 @@ void main(void)
 	int ret = 0;
 
 	/* initialize bluetooth */
-	ret = bt_init(&bluetooth_callbacks);
-	if (!ret) {
+	ret = bt_init(&bluetooth_callbacks, &remote_callbacks);
+	if (ret) {
+		LOG_ERR("main: can't initialize bt >%d<", ret);
+	} else {
 
 		/* setup leds and buttons */
 		ret = configure_dk_buttons_leds();
