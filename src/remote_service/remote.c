@@ -38,7 +38,7 @@ static ssize_t read_button_characteristic_cb(struct bt_conn *conn, const struct 
 void button_chrc_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value);
 static ssize_t on_write(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
 
-/* macro to defice a bt service */
+/* macro to define a bt service and characteristics */
 BT_GATT_SERVICE_DEFINE(remote_srv,
 BT_GATT_PRIMARY_SERVICE(BT_UUID_REMOTE_SERVICE),
     BT_GATT_CHARACTERISTIC(BT_UUID_REMOTE_BUTTON_CHRC,
@@ -87,8 +87,6 @@ static ssize_t on_write(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 /* Remote controller functions */
 int send_button_notification(struct bt_conn *conn, uint8_t value)
 {
-    int err = 0;
-
     struct bt_gatt_notify_params params = {0};
     const struct bt_gatt_attr *attr = &remote_srv.attrs[2];
 
@@ -97,8 +95,7 @@ int send_button_notification(struct bt_conn *conn, uint8_t value)
     params.len = 1;
     params.func = on_sent;
 
-    err = bt_gatt_notify_cb(conn, &params);
-
+    int err = bt_gatt_notify_cb(conn, &params);
     return err;
 }
 
