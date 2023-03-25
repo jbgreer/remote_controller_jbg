@@ -37,7 +37,7 @@ struct bt_remote_service_cb {
     void (*data_received)(struct bt_conn *conn, const uint8_t *const data, uint16_t len);
 };
 
-int bt_init(struct bt_conn_cb *bt_cb, struct bt_remote_service_cb *remote_cb);
+int bt_init(struct bt_le_adv_param *param, struct bt_conn_cb *bt_cb, struct bt_remote_service_cb *remote_cb);
 void set_button_value(uint8_t btn_val);
 int send_button_notification(struct bt_conn *conn, uint8_t value);
 

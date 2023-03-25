@@ -15,6 +15,11 @@
 #define LOG_MODULE_NAME			app
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
+/*  BLE Advertisement options and min/max intervals */
+#define BT_LE_ADV_INT_MIN		6399
+#define BT_LE_ADV_INT_MAX		6401
+static struct bt_le_adv_param bt_param = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE, BT_LE_ADV_INT_MIN, BT_LE_ADV_INT_MAX, NULL);
+
 /* blink LED 1 every 1000 msecs when running */
 #define RUN_STATUS_LED			DK_LED1
 #define RUN_LED_BLINK_INTERVAL	1000
@@ -154,7 +159,8 @@ void main(void)
 	int ret = 0;
 
 	/* initialize bluetooth */
-	ret = bt_init(&bluetooth_callbacks, &remote_callbacks);
+	/* ret = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));  */
+	ret = bt_init(&bt_param, &bluetooth_callbacks, &remote_callbacks);
 	if (ret) {
 		LOG_ERR("main: can't initialize bt >%d<", ret);
 	} else {

@@ -117,7 +117,7 @@ void set_button_value(uint8_t btn_val) {
 /* 
  * bt_init
 */
-int bt_init(struct bt_conn_cb *bt_cb, struct bt_remote_service_cb *remote_cb) {
+int bt_init(struct bt_le_adv_param *param, struct bt_conn_cb *bt_cb, struct bt_remote_service_cb *remote_cb) {
     int ret = 0;
     LOG_INF("bt_init >%d<", ret);
 
@@ -142,7 +142,8 @@ int bt_init(struct bt_conn_cb *bt_cb, struct bt_remote_service_cb *remote_cb) {
     LOG_INF("bt_enable >%d<", ret);
 
     /* begin advertising */
-    ret = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
+    /* ret = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd)); */
+    ret = bt_le_adv_start(param, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
     if (ret){
         LOG_ERR("bt_le_adv_start >%d<", ret);
         return ret;
